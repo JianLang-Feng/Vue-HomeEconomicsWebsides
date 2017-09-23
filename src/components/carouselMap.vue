@@ -1,26 +1,28 @@
 <template>
 	<div id="carouselMap">
 		<div class="imgList">
-			<transition name="fade">
+			<transition :name="myType">
 				<img :src="img" v-for="(img, imgIndex) in imgs" :key="imgIndex" v-if="active === imgIndex">
 				<!-- <img :src="imgs[active]"> -->
 			</transition>
 		</div>
 		<div class="handel">
-			<div class="point" v-if="isPoint">
+			<div class="point" v-if="isPoint" @mouseout="autoPlay()">
 				<div 
 				:class="pointIndex === active ? 'round active' : 'round'" 
 				v-for="(point, pointIndex) in imgs" 
 				:key="pointIndex"
-				@click="active = pointIndex"></div>
+				@click="active = pointIndex"
+				@mouseover="stopPlay(pointIndex)"
+				></div>
 			</div>
 			<div class="handler">
-				<div class="left" @click="active--">
+				<div class="left" @click="changeBanner(-1)">
 					<svg class="icon" aria-hidden="true">
 						<use xlink:href="#icon-lt"></use>
 					</svg>
 				</div>
-				<div class="right" @click="active++">
+				<div class="right" @click="changeBanner(1)">
 					<svg class="icon" aria-hidden="true">
 						<use xlink:href="#icon-gt"></use>
 					</svg>
@@ -40,11 +42,18 @@ export default {
 				'../../static/imgs/banner1.png',
 				'../../static/imgs/banner2.jpg',
 				'../../static/imgs/banner3.jpg'
-			]
+			],
+			timer: '',
+			myType: this.type
 		}
 	},
 	watch: {
-		active() {
+		active(val, old) {
+			if (old > val && this.type === 'turnBox') {
+				this.myType = 'turnBox-turnBack';
+			} else if (this.myType === 'turnBox-turnBack') {
+				this.myType = 'turnBox';
+			}
 			if (this.active < 0) {
 				this.active = this.imgs.length - 1;
 			}
@@ -56,8 +65,33 @@ export default {
 	methods: {
 		changeBanner(i) {
 			this.active += i;
+			this.autoPlay();
+		},
+		stopPlay(i) {
+			clearInterval(this.timer);
+			this.active = i;
+		},
+		autoPlay() {
+			clearInterval(this.timer);
+			// this.timer = setInterval(() => {
+			// 	this.active++;
+			// }, this.dalay * 1000);
+		}
+	},
+	created() {
+		this.autoPlay();
+	},
+	props: {
+		type: {
+			type: String,
+			default: 'fade'
+		},
+		dalay: {
+			type: Number,
+			default: 3
 		}
 	}
+
 }
 </script>
 
@@ -73,6 +107,7 @@ export default {
 		overflow: hidden;
 		white-space: nowrap;
 		position: relative;
+    perspective: 2000px;
 		img {
 			position: absolute;
 			left: 0;
@@ -131,11 +166,56 @@ export default {
 			}
 		}
 	}
+
+
+//* 动画类型
+
+
+//* 渐隐(默认)
 	.fade-enter-active, .fade-leave-active {
-		transition: opacity .5s
+		transition: opacity 1s
 	}
-	.fade-enter, .fade-leave-to/* .fade-leave-active in below version 2.1.8 */ {
+	//* 离开状态
+	.fade-leave-to, .fade-enter {
 		opacity: 0;
 	}
+
+//翻转盒子
+	//* 过度过程 可以用来定义时间、延迟和曲线函数
+	.turnBox-enter-active, .turnBox-leave-active, .turnBox-turnBack-enter-active, .turnBox-turnBack-leave-active {
+		backface-visibility: hidden;
+		transition: transform 1s;
+	}
+
+	//* 离开状态
+	.turnBox-leave-to {
+		transform: rotateX(90deg);
+		transform-origin: 50% 50% -340px;
+	}
+	.turnBox-enter {
+		transform: rotateX(-90deg);
+	}
+	//* 进入状态
+	.turnBox-enter-to {
+		transform: rotateX(0deg);
+		transform-origin: 50% 50% -340px;
+	}
+
+	//* 离开状态
+	.turnBox-turnBack-leave {
+	}
+	.turnBox-turnBack-leave-to {
+		transform: rotateX(-90deg);
+		transform-origin: 50% 50% -340px;
+	}
+	.turnBox-turnBack-enter {
+		transform: rotateX(90deg);
+	}
+	//* 进入状态
+	.turnBox-turnBack-enter-to {
+		transform: rotateX(0deg);
+		transform-origin: 50% 50% -340px;
+	}
+
 }
 </style>
