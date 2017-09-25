@@ -19,7 +19,7 @@
         </p>
       </div>
     </header>
-    <nav class="clearfix">
+    <nav class="clearfix buttonWave">
       <div class="container">
         <img src="../../static/imgs/logo.png" alt="睦子荟" class="logo">
         <transition name="fade">
@@ -42,6 +42,8 @@
 <style lang="scss" scoped>
 #header{
   min-width: 1200px;
+  float: left;
+  width: 100%;
   .container{
     width: 1200px;
     margin: 0 auto;
@@ -59,21 +61,21 @@
     }
   }
   nav{
+    position: relative;
+    z-index: 2;
     width: 100%;
     margin: 0 auto;
-    background-color: #fff;
-    box-shadow: 0 2px 10px #ddd;
     .logo{
       float: left;
-      height: 110px;
-      line-height: 110px;
+      height: 120px;
+      line-height: 120px;
       cursor: pointer;
     }
     ul{
       float: right;
       li{
         float: left;
-        line-height: 110px;
+        line-height: 120px;
         margin-left: 20px;
         padding: 0 10px;
         cursor: pointer;

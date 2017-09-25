@@ -1,7 +1,7 @@
 <template>
 	<div id="carouselMap">
 		<div class="imgList">
-			<transition :name="myType">
+			<transition :name="myType" ref='transition' @before-enter="animated = true;" @after-leave="animated = false">
 				<img :src="img" v-for="(img, imgIndex) in imgs" :key="imgIndex" v-if="active === imgIndex">
 				<!-- <img :src="imgs[active]"> -->
 			</transition>
@@ -36,15 +36,16 @@
 export default {
 	data() {
 		return {
-			isPoint: true,
 			active: 0,
 			imgs: [
 				'../../static/imgs/banner1.png',
 				'../../static/imgs/banner2.jpg',
+				'../../static/imgs/banner2.jpg',
 				'../../static/imgs/banner3.jpg'
 			],
 			timer: '',
-			myType: this.type
+			myType: this.type,
+			animated: false
 		}
 	},
 	watch: {
@@ -64,18 +65,20 @@ export default {
 	},
 	methods: {
 		changeBanner(i) {
+			if (this.animated) return
 			this.active += i;
 			this.autoPlay();
 		},
 		stopPlay(i) {
+			if (this.animated) return
 			clearInterval(this.timer);
 			this.active = i;
 		},
 		autoPlay() {
 			clearInterval(this.timer);
-			// this.timer = setInterval(() => {
-			// 	this.active++;
-			// }, this.dalay * 1000);
+			this.timer = setInterval(() => {
+				this.active++;
+			}, this.dalay * 1000);
 		}
 	},
 	created() {
@@ -89,6 +92,10 @@ export default {
 		dalay: {
 			type: Number,
 			default: 3
+		},
+		isPoint: {
+			type: Boolean,
+			default: false
 		}
 	}
 
@@ -98,8 +105,11 @@ export default {
 <style lang="scss" scoped>
 #carouselMap {
 	position: relative;
+  float: left;
+  width: 100%;
+	top: -10px;
 	min-width: 1200px;
-	height: 680px;
+	height: 700px;
 	.imgList {
 		height: 100%;
 		width: 100%;
@@ -113,14 +123,15 @@ export default {
 			left: 0;
 			top: 0;
 			width: 100%;
-			height: 680px;
+			height: 700px;
 		}
 	}
 	.handel {
+		z-index: 0;
 		.point {
 			position: absolute;
 			left: 50%;
-			bottom: 10px;
+			bottom: 20px;
 			transform: translateX(-50%);
 			.round {
 				width: 12px;
@@ -190,7 +201,7 @@ export default {
 	//* 离开状态
 	.turnBox-leave-to {
 		transform: rotateX(90deg);
-		transform-origin: 50% 50% -340px;
+		transform-origin: 50% 50% -350px;
 	}
 	.turnBox-enter {
 		transform: rotateX(-90deg);
@@ -198,15 +209,13 @@ export default {
 	//* 进入状态
 	.turnBox-enter-to {
 		transform: rotateX(0deg);
-		transform-origin: 50% 50% -340px;
+		transform-origin: 50% 50% -350px;
 	}
 
 	//* 离开状态
-	.turnBox-turnBack-leave {
-	}
 	.turnBox-turnBack-leave-to {
 		transform: rotateX(-90deg);
-		transform-origin: 50% 50% -340px;
+		transform-origin: 50% 50% -350px;
 	}
 	.turnBox-turnBack-enter {
 		transform: rotateX(90deg);
@@ -214,7 +223,7 @@ export default {
 	//* 进入状态
 	.turnBox-turnBack-enter-to {
 		transform: rotateX(0deg);
-		transform-origin: 50% 50% -340px;
+		transform-origin: 50% 50% -350px;
 	}
 
 }
